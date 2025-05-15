@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  forum_db:
+    image: postgres:latest
+    container_name: forum_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: forum
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  forum_service:
+    build:
+      context: .
+    container_name: forum_service
+    environment:
+      DB_HOST: forum_db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: forum
+    ports:
+      - "8083:8083"
+    depends_on:
+      - forum_db
+
+volumes:
+  pgdata:

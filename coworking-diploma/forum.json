@@ -1,0 +1,142 @@
+{
+    "info": {
+      "name": "Forum Service (New Routes)",
+      "_postman_id": "forum-service-collection",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Create Post",
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"user_id\": 1,\n  \"title\": \"First Post\",\n  \"content\": \"This is my first post!\",\n  \"tags\": [\"job\", \"news\"]\n}"
+          },
+          "url": {
+            "raw": "{{base_url}}/api/forum/posts",
+            "host": ["{{base_url}}"],
+            "path": ["api", "forum", "posts"]
+          }
+        }
+      },
+      {
+        "name": "Get All Posts",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/api/forum/posts",
+            "host": ["{{base_url}}"],
+            "path": ["api", "forum", "posts"]
+          }
+        }
+      },
+      {
+        "name": "Get Post By ID",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/api/forum/posts/id/1",
+            "host": ["{{base_url}}"],
+            "path": ["api", "forum", "posts", "id", "1"]
+          }
+        }
+      },
+      {
+        "name": "Delete Post By ID",
+        "request": {
+          "method": "DELETE",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/api/forum/posts/id/1",
+            "host": ["{{base_url}}"],
+            "path": ["api", "forum", "posts", "id", "1"]
+          }
+        }
+      },
+      {
+        "name": "Get Posts By User",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/api/forum/posts/user/1",
+            "host": ["{{base_url}}"],
+            "path": ["api", "forum", "posts", "user", "1"]
+          }
+        }
+      },
+      {
+        "name": "Create Comment",
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"user_id\": 2,\n  \"content\": \"Nice post!\"\n}"
+          },
+          "url": {
+            "raw": "{{base_url}}/api/forum/posts/1/comments",
+            "host": ["{{base_url}}"],
+            "path": ["api", "forum", "posts", "1", "comments"]
+          }
+        }
+      },
+      {
+        "name": "Get Comments By Post",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/api/forum/posts/1/comments",
+            "host": ["{{base_url}}"],
+            "path": ["api", "forum", "posts", "1", "comments"]
+          }
+        }
+      },
+      {
+        "name": "Get Comment By ID",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/api/forum/comments/1",
+            "host": ["{{base_url}}"],
+            "path": ["api", "forum", "comments", "1"]
+          }
+        }
+      },
+      {
+        "name": "Delete Comment By ID",
+        "request": {
+          "method": "DELETE",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/api/forum/comments/1",
+            "host": ["{{base_url}}"],
+            "path": ["api", "forum", "comments", "1"]
+          }
+        }
+      },
+      {
+        "name": "Get Comments By User",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/api/forum/comments/user/2",
+            "host": ["{{base_url}}"],
+            "path": ["api", "forum", "comments", "user", "2"]
+          }
+        }
+      }
+    ]
+  }
+  

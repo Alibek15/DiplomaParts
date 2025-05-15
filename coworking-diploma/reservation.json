@@ -1,0 +1,113 @@
+{
+    "info": {
+      "_postman_id": "8f1234ab-5678-4321-90ab-1234cdef5678",
+      "name": "Reservation-service API",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Create Reservation",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"user_id\": 1,\n  \"room_id\": 1,\n  \"seat_id\": 1,\n  \"available\": true,\n  \"start_time\": \"2025-04-22T10:00:00Z\",\n  \"end_time\": \"2025-04-22T12:00:00Z\",\n  \"total_price\": 500,\n  \"status\": \"active\"\n}"
+          },
+          "url": {
+            "raw": "{{baseUrl}}/api/reservations/",
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "path": [
+              "api",
+              "reservations"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Get All Reservations",
+        "request": {
+          "method": "GET",
+          "url": {
+            "raw": "{{baseUrl}}/api/reservations/",
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "path": [
+              "api",
+              "reservations"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Get Reservation By ID",
+        "request": {
+          "method": "GET",
+          "url": {
+            "raw": "{{baseUrl}}/api/reservations/1",
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "path": [
+              "api",
+              "reservations",
+              "1"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Update Reservation",
+        "request": {
+          "method": "PUT",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"user_id\": 1,\n  \"room_id\": 1,\n  \"seat_id\": 1,\n  \"available\": true,\n  \"start_time\": \"2025-04-22T11:00:00Z\",\n  \"end_time\": \"2025-04-22T13:00:00Z\",\n  \"total_price\": 600,\n  \"status\": \"updated\"\n}"
+          },
+          "url": {
+            "raw": "{{baseUrl}}/api/reservations/1",
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "path": [
+              "api",
+              "reservations",
+              "1"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Delete Reservation",
+        "request": {
+          "method": "DELETE",
+          "url": {
+            "raw": "{{baseUrl}}/api/reservations/1",
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "path": [
+              "api",
+              "reservations",
+              "1"
+            ]
+          }
+        }
+      }
+    ]
+  }
+  

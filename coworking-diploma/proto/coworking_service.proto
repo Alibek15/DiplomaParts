@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package coworking;
+
+option go_package = "coworking-diploma/coworking-service/proto";
+
+
+
+
+service CoworkingService {
+  rpc GetRoomByID (GetRoomRequest) returns (GetRoomResponse);
+  rpc GetSeatByID (GetSeatRequest) returns (GetSeatResponse);
+}
+
+message GetRoomRequest {
+  uint32 room_id = 1;
+}
+
+message GetRoomResponse {
+  uint32 id = 1;
+  string name = 2;
+  string type = 3;
+  int32 capacity = 4;
+  double price_per_hour = 5;
+  string status = 6;
+}
+
+message GetSeatRequest {
+  uint32 seat_id = 1;
+}
+
+message GetSeatResponse {
+  uint32 id = 1;
+  string number = 2;
+  double price_per_hour = 3;
+  string status = 4;
+}

@@ -1,0 +1,105 @@
+{
+    "info": {
+      "_postman_id": "c8fc7f38-9187-4a7e-92e6-493d2a5e0780",
+      "name": "Coworking-service API",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Create Coworking Space",
+        "request": {
+          "method": "POST",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"Central Hub\",\n  \"location\": \"Downtown\",\n  \"amenities\": \"Wi-Fi, Coffee, Printers\"\n}"
+          },
+          "url": { "raw": "{{baseUrl}}/api/coworking/spaces", "host": ["{{baseUrl}}"], "path": ["api", "coworking", "spaces"] }
+        }
+      },
+      {
+        "name": "Get All Coworking Spaces",
+        "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/coworking/spaces", "host": ["{{baseUrl}}"], "path": ["api", "coworking", "spaces"] } }
+      },
+      {
+        "name": "Get Coworking Space By ID",
+        "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/coworking/spaces/details/1", "host": ["{{baseUrl}}"], "path": ["api", "coworking", "spaces", "details", "1"] } }
+      },
+      {
+        "name": "Update Coworking Space",
+        "request": {
+          "method": "PUT",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": { "mode": "raw", "raw": "{\n  \"name\": \"Central Hub Updated\",\n  \"location\": \"Uptown\",\n  \"amenities\": \"Wi-Fi, Coffee, Printers, Lounge\"\n}" },
+          "url": { "raw": "{{baseUrl}}/api/coworking/spaces/1", "host": ["{{baseUrl}}"], "path": ["api", "coworking", "spaces", "1"] }
+        }
+      },
+      {
+        "name": "Delete Coworking Space",
+        "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/coworking/spaces/1", "host": ["{{baseUrl}}"], "path": ["api", "coworking", "spaces", "1"] } }
+      },
+  
+      {
+        "name": "Create Room",
+        "request": {
+          "method": "POST",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": { "mode": "raw", "raw": "{\n  \"space_id\": 1,\n  \"name\": \"Conference Room 1\",\n  \"type\": \"meeting\",\n  \"capacity\": 10,\n  \"price_per_hour\": 50.0,\n  \"status\": \"available\"\n}" },
+          "url": { "raw": "{{baseUrl}}/api/coworking/rooms", "host": ["{{baseUrl}}"], "path": ["api", "coworking", "rooms"] }
+        }
+      },
+      {
+        "name": "Get All Rooms",
+        "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/coworking/rooms", "host": ["{{baseUrl}}"], "path": ["api", "coworking", "rooms"] } }
+      },
+      {
+        "name": "Get Room By ID",
+        "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/coworking/rooms/details/1", "host": ["{{baseUrl}}"], "path": ["api", "coworking", "rooms", "details", "1"] } }
+      },
+      {
+        "name": "Update Room",
+        "request": {
+          "method": "PUT",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": { "mode": "raw", "raw": "{\n  \"space_id\": 1,\n  \"name\": \"Conference Room 1 Updated\",\n  \"type\": \"meeting\",\n  \"capacity\": 12,\n  \"price_per_hour\": 55.0,\n  \"status\": \"available\"\n}" },
+          "url": { "raw": "{{baseUrl}}/api/coworking/rooms/1", "host": ["{{baseUrl}}"], "path": ["api", "coworking", "rooms", "1"] }
+        }
+      },
+      {
+        "name": "Delete Room",
+        "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/coworking/rooms/1", "host": ["{{baseUrl}}"], "path": ["api", "coworking", "rooms", "1"] } }
+      },
+  
+      {
+        "name": "Create Seat",
+        "request": {
+          "method": "POST",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": { "mode": "raw", "raw": "{\n  \"room_id\": 1,\n  \"number\": \"Workplace 5\",\n  \"price_per_hour\": 10.0,\n  \"status\": \"available\"\n}" },
+          "url": { "raw": "{{baseUrl}}/api/coworking/seats", "host": ["{{baseUrl}}"], "path": ["api", "coworking", "seats"] }
+        }
+      },
+      {
+        "name": "Get All Seats",
+        "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/coworking/seats", "host": ["{{baseUrl}}"], "path": ["api", "coworking", "seats"] } }
+      },
+      {
+        "name": "Get Seat By ID",
+        "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/coworking/seats/details/1", "host": ["{{baseUrl}}"], "path": ["api", "coworking", "seats", "details", "1"] } }
+      },
+      {
+        "name": "Update Seat",
+        "request": {
+          "method": "PUT",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": { "mode": "raw", "raw": "{\n  \"room_id\": 1,\n  \"number\": \"Workplace 5 Updated\",\n  \"price_per_hour\": 12.0,\n  \"status\": \"available\"\n}" },
+          "url": { "raw": "{{baseUrl}}/api/coworking/seats/1", "host": ["{{baseUrl}}"], "path": ["api", "coworking", "seats", "1"] }
+        }
+      },
+      {
+        "name": "Delete Seat",
+        "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/coworking/seats/1", "host": ["{{baseUrl}}"], "path": ["api", "coworking", "seats", "1"] } }
+      }
+    ]
+  }
+  
