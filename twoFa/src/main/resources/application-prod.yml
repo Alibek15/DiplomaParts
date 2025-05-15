@@ -1,0 +1,47 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/twofactor?currentSchema=myapp
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      schema: myapp
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate.default_schema: myapp
+
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+    template:
+      default-receive-queue: registration_queue
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: 2018nightmare19@gmail.com
+    password: "bnqh ksrp sdgx fyas"
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+    protocol: smtp
+
+  jackson:
+    serialization:
+      indent-output: true
+
+jwt:
+  secret: this_is_a_super_secret_key_of_32_bytes!
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    org.hibernate.SQL: INFO
