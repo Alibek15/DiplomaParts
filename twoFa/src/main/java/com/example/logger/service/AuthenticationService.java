@@ -1,88 +1,96 @@
 package com.example.logger.service;
 
-
+import com.example.logger.entity.AccountStatus;
+import com.example.logger.entity.TwoFactor;
 import com.example.logger.entity.User;
 import com.example.logger.messaging.MessagePublisher;
 import com.example.logger.messaging.TwoFactorAuthEvent;
 import com.example.logger.registerReq.LoginRequest;
 import com.example.logger.registerReq.TwoFactorConfirmRequest;
+import com.example.logger.repository.TwoFactorRepository;
 import com.example.logger.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.service.spi.ServiceException;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService {
+@Slf4j
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final MessagePublisher messagePublisher;
+
+public class AuthenticationService {
+    private final UserRepository userRepo;
+    private final TwoFactorRepository tfRepo;
+    private final PasswordEncoder encoder;
+    private final MessagePublisher publisher;
     private final JWTService jwtService;
 
-    public void login(LoginRequest request) {
-        Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
-
-        if (optionalUser.isEmpty()) {
+    /** Шаг 1: login → генерируем и сохраняем 2FA */
+    @Transactional
+    public void login(LoginRequest req) {
+        User user = userRepo.findByEmail(req.getEmail())
+                .orElseThrow(() -> new ServiceException("Invalid email or password"));
+        if (!encoder.matches(req.getPassword(), user.getPassword())) {
             throw new ServiceException("Invalid email or password");
         }
 
-        User user = optionalUser.get();
+        // 1) удалить старый TwoFactor (если он был)
+        tfRepo.findByUser(user)
+                .ifPresent(oldTf -> tfRepo.delete(oldTf));
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new ServiceException("Invalid email or password");
-        }
+        // 2) создать новый TwoFactor
+        TwoFactor tf = new TwoFactor();
+        String code = generateNumericCode();
+        tf.setTwoFaCode(code);
+        tf.setVerificationCode(UUID.randomUUID().toString());
+        tf.setTwoFaExpiry(Date.from(Instant.now().plus(5, ChronoUnit.MINUTES)));
 
-        if (user.getAccountStatus() != com.example.logger.entity.AccountStatus.ACTIVE) {
-            throw new ServiceException("Account not confirmed");
-        }
+        // 3) связать и сохранить
+        user.setTwoFactor(tf);
+        userRepo.save(user);
 
-        String twoFactorCode = generateTwoFactorCode();
-        Date expiry = new Date(System.currentTimeMillis() + 5 * 60 * 1000); // 5 минут
-
-        user.setTwoFaCode(twoFactorCode);
-        user.setTwoFaExpiry(expiry);
-        userRepository.save(user);
-
-        messagePublisher.sendTwoFactorAuthEvent(new TwoFactorAuthEvent(user.getEmail(), twoFactorCode));
+        // 4) отправить код
+        publisher.sendTwoFactorAuthEvent(new TwoFactorAuthEvent(
+                user.getEmail(), code));
     }
 
-    public String confirmTwoFactor(TwoFactorConfirmRequest request) {
-        Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
+    /** Шаг 2: confirm-2fa → активируем и удаляем запись 2FA */
+    @Transactional
+    public String confirmTwoFactor(TwoFactorConfirmRequest req) {
+        TwoFactor tf = tfRepo.findByTwoFaCode(req.getCode())
+                .orElseThrow(() -> new ServiceException("Invalid 2FA code"));
 
-        if (optionalUser.isEmpty()) {
-            throw new ServiceException("Invalid email");
+        Date expiry = tf.getTwoFaExpiry();
+        if (expiry.before(new Date())) {
+            throw new ServiceException("2FA code expired");
         }
 
-        User user = optionalUser.get();
+        User user = tf.getUser();
+        user.setAccountStatus(AccountStatus.ACTIVE);
 
-        if (user.getTwoFaCode() == null || user.getTwoFaExpiry() == null) {
-            throw new ServiceException("Two-factor authentication not initialized");
-        }
+        // отвязываем и удаляем TwoFactor
+        user.removeTwoFactor();
+        // благодаря cascade=ALL запись удалится автоматически при сохранении user,
+        // но можно и явно:
+        // tfRepo.delete(tf);
 
-        if (new Date().after(user.getTwoFaExpiry())) {
-            throw new ServiceException("Two-factor authentication code expired");
-        }
+        userRepo.save(user);
 
-        if (!user.getTwoFaCode().equals(request.getCode())) {
-            throw new ServiceException("Invalid two-factor authentication code");
-        }
-
-        // Очищаем код после успешной аутентификации
-        user.setTwoFaCode(null);
-        user.setTwoFaExpiry(null);
-        userRepository.save(user);
-
-        // Генерируем JWT токен
+        // генерируем JWT
         return jwtService.generateToken(user);
     }
 
-    private String generateTwoFactorCode() {
-        return String.valueOf((int)(Math.random() * 900000) + 100000); // 6-значный код
+    private String generateNumericCode() {
+        return String.valueOf(ThreadLocalRandom.current().nextInt(100000, 999999));
     }
 }

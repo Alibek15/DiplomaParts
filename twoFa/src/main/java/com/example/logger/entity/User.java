@@ -19,15 +19,17 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+
 @Entity
 @Table(name = "USERS", schema = "myapp")
-@Builder(toBuilder = true)
+@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class User implements UserDetails {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "USER_ID", nullable = false)
     private Long userId;
 
@@ -57,14 +59,8 @@ public class User implements UserDetails {
     @NotNull(message = "Role is required")
     private Role role;
 
-    @Column(name = "VERIFICATION_CODE")
-    private String verificationCode;
-
-    @Column(name = "TWO_FA_CODE")
-    private String twoFaCode;
-
-    @Column(name = "TWO_FA_EXPIRY")
-    private Date twoFaExpiry;
+    @Column(name = "PHONE_NUMBER")
+    private String phoneNumber;
 
     @Column(name = "REGISTRATION_DATE", nullable = false)
     private Date registrationDate;
@@ -73,7 +69,30 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus;
 
-    // Методы из UserDetails для Spring Security
+    // ✅ Только для COMPANY, иначе null
+    @Column(name = "COMPANY_NAME")
+    private String companyName;
+
+    @Column(name = "WEBSITE")
+    private String website;
+
+    @Column(name = "INDUSTRY")
+    private String industry; // Enum можно отдельно, но строка сейчас
+
+    @Column(name = "COMPANY_SIZE")
+    private String companySize;
+
+
+
+    @OneToOne(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,      // ← каскадируем persist, remove и т.д.
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonIgnore
+    private TwoFactor twoFactor;
+
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -108,95 +127,77 @@ public class User implements UserDetails {
         this.accountStatus = accountStatus;
     }
 
-    public void setVerificationCode(String verificationCode) {
-        this.verificationCode = verificationCode;
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 
-    public Long getUserId() {
-        return userId;
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    public void setIndustry(String industry) {
+        this.industry = industry;
+    }
+
+    public void setCompanySize(String companySize) {
+        this.companySize = companySize;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public void setUserId(final Long userId) {
         this.userId = userId;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
     public void setUsername(final String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setPassword(final String password) {
         this.password = password;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
     public void setEmail(final String email) {
         this.email = email;
-    }
-
-    public String getFirstName() {
-        return firstName;
     }
 
     public void setFirstName(final String firstName) {
         this.firstName = firstName;
     }
 
-    public String getLastName() {
-        return lastName;
-    }
-
     public void setLastName(final String lastName) {
         this.lastName = lastName;
-    }
-
-    public Role getRole() {
-        return role;
     }
 
     public void setRole(final Role role) {
         this.role = role;
     }
-
-    public String getVerificationCode() {
-        return verificationCode;
-    }
-
-    public String getTwoFaCode() {
-        return twoFaCode;
-    }
-
-    public void setTwoFaCode(final String twoFaCode) {
-        this.twoFaCode = twoFaCode;
-    }
-
-    public Date getTwoFaExpiry() {
-        return twoFaExpiry;
-    }
-
-    public void setTwoFaExpiry(final Date twoFaExpiry) {
-        this.twoFaExpiry = twoFaExpiry;
-    }
-
-    public Date getRegistrationDate() {
-        return registrationDate;
+    public void removeTwoFactor() {
+        if (this.twoFactor != null) {
+            this.twoFactor.setUser(null);
+            this.twoFactor = null;
+        }
     }
 
     public void setRegistrationDate(final Date registrationDate) {
         this.registrationDate = registrationDate;
     }
 
-    public AccountStatus getAccountStatus() {
-        return accountStatus;
+
+    public void setTwoFactor(TwoFactor twoFactor) {
+        // отвязываем старую, если надо
+        if (this.twoFactor != null) {
+            this.twoFactor.setUser(null);
+        }
+        this.twoFactor = twoFactor;
+        if (twoFactor != null && twoFactor.getUser() != this) {
+            twoFactor.setUser(this);
+        }
+    }
+
+    public TwoFactor getTwoFactor() {
+        return twoFactor;
     }
 }

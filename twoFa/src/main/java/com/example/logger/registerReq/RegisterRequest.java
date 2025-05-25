@@ -26,5 +26,15 @@ public class RegisterRequest {
     private String confirmPassword;
 
     @NotBlank(message = "Role is required")
-    private String role; // ВАЖНО: String, а не enum здесь
+    private String role;
+
+    // Company-specific fields (optional for ROLE == USER)
+    private String companyName;
+    private String website;
+    private String industry;
+    private String companySize;
+    private String phoneNumber;
+    public boolean isCompany() {
+        return "COMPANY".equalsIgnoreCase(role);
+    }
 }

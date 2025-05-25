@@ -20,22 +20,17 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
-
-    private final AuthenticationService authenticationService;
+    private final AuthenticationService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Validated @RequestBody LoginRequest request) {
-        authenticationService.login(request);
-        return ResponseEntity.ok("Two-factor authentication code sent to your email");
+    public ResponseEntity<Void> login(@RequestBody LoginRequest req) {
+        authService.login(req);
+        return ResponseEntity.ok().build();  // отправили код на почту
     }
 
     @PostMapping("/confirm-2fa")
-    public ResponseEntity<Map<String, String>> confirmTwoFactor(@Validated @RequestBody TwoFactorConfirmRequest request) {
-        String token = authenticationService.confirmTwoFactor(request);
-
-        Map<String, String> response = new HashMap<>();
-        response.put("token", token);
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Map<String,String>> confirm2fa(@RequestBody TwoFactorConfirmRequest req) {
+        String token = authService.confirmTwoFactor(req);
+        return ResponseEntity.ok(Map.of("token", token));
     }
 }
