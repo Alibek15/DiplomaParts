@@ -41,7 +41,7 @@ public class RegistrationService {
                 .orElseThrow(() -> new ServiceException("Invalid verification code"));
 
         User user = tf.getUser();
-        // Снимаем связь, чтобы save(user) не «затирал» two_factor.user_id
+
         user.setTwoFactor(null);
         user.setAccountStatus(AccountStatus.ACTIVE);
         userRepository.save(user);
@@ -52,7 +52,7 @@ public class RegistrationService {
 
     @Transactional
     public void register(RegisterRequest request) {
-        // Валидация
+
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new ServiceException("Passwords do not match");
         }
@@ -83,11 +83,11 @@ public class RegistrationService {
             throw new ServiceException("Phone number is required");
         }
 
-        // Генерируем verification code
+
         String verificationCode = UUID.randomUUID().toString();
         log.info("Generated verification code: {} for email: {}", verificationCode, request.getEmail());
 
-        // Создаем пользователя
+
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
@@ -107,7 +107,7 @@ public class RegistrationService {
         User savedUser = userRepository.save(user);
         log.info("User created with ID: {} and email: {}", savedUser.getUserId(), savedUser.getEmail());
 
-        // Создаем TwoFactor запись
+
         try {
             TwoFactor twoFactor = twoFactorService.createTwoFactorEntry(savedUser, verificationCode);
             log.info("TwoFactor record created with ID: {} for user: {}", twoFactor.getTwoFactorId(), savedUser.getEmail());
@@ -116,14 +116,14 @@ public class RegistrationService {
             throw new ServiceException("Failed to create verification record");
         }
 
-        // Отправляем событие в RabbitMQ
+
         try {
             RegistrationEvent event = new RegistrationEvent(savedUser.getEmail(), verificationCode);
             messagePublisher.sendRegistrationEvent(event);
             log.info("Registration event sent to RabbitMQ for user: {}", savedUser.getEmail());
         } catch (Exception e) {
             log.error("Failed to send registration event for user: {}", savedUser.getEmail(), e);
-            // Не прерываем процесс, но логируем ошибку
+
         }
     }
 }

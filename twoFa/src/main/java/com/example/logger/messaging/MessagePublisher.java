@@ -27,7 +27,7 @@ public class MessagePublisher {
 
     public void sendTwoFactorAuthEvent(TwoFactorAuthEvent event) {
         try {
-            String jsonMessage = objectMapper.writeValueAsString(event); // сериализация в JSON
+            String jsonMessage = objectMapper.writeValueAsString(event);
             log.info("Sending TwoFactorAuthEvent to queue [{}]: {}", RabbitMQConfig.TWO_FACTOR_QUEUE, jsonMessage);
             rabbitTemplate.convertAndSend(RabbitMQConfig.TWO_FACTOR_QUEUE, jsonMessage);
         } catch (Exception e) {

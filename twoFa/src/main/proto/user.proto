@@ -1,40 +1,73 @@
 syntax = "proto3";
+package logger;
 
-option java_multiple_files = true;
-option java_package = "com.example.logger";
-option java_outer_classname = "UserServiceProto";
+import "google/protobuf/timestamp.proto";
 
-package user;
-
-service UserService {
-  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
-  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+enum Role {
+  ROLE_UNSPECIFIED = 0;
+  USER             = 1;
+  COMPANY          = 2;
+}
+enum AccountStatus {
+  ACCOUNT_STATUS_UNSPECIFIED = 0;
+  NOT_CONFIRMED              = 1;
+  ACTIVE                     = 2;
+  BANNED                     = 3;
 }
 
 message UpdateUserRequest {
-  int64 user_id = 1;
-  string first_name = 2;
-  string last_name = 3;
-  string email = 4;
-  string phone_number = 5;
-  string role = 6;
-  string company_name = 7;
-  string website = 8;
-  string industry = 9;
-  string company_size = 10;
+  int64 user_id        = 1;
+  string username      = 2;
+  string email         = 3;
+  string first_name    = 4;
+  string last_name     = 5;
+  string phone_number  = 6;
+  Role   role          = 7;
+  // Поля для COMPANY
+  string company_name  = 8;
+  string website       = 9;
+  string industry      = 10;
+  string company_size  = 11;
 }
 
+message GetUserRequest {
+  int64 user_id = 1;
+}
+
+// Ответ с полной информацией о пользователе
+message GetUserResponse {
+  int64 user_id       = 1;
+  string username     = 2;
+  string email        = 3;
+  string first_name   = 4;
+  string last_name    = 5;
+  string phone_number = 6;
+  Role   role         = 7;
+  AccountStatus account_status = 8;
+  string company_name  = 9;
+  string website      = 10;
+  string industry     = 11;
+  string company_size = 12;
+  google.protobuf.Timestamp registration_date = 13;
+}
 message UpdateUserResponse {
-  bool success = 1;
+  bool   success = 1;
   string message = 2;
 }
 
+// Добавляем недостающие сообщения для DeleteUser
 message DeleteUserRequest {
-  int64 user_id = 1;
-  string requester_role = 2; // only ADMIN can delete
+  int64 user_id         = 1;
+  string requester_role = 2;    // добавляем поле
 }
 
 message DeleteUserResponse {
-  bool success = 1;
+  bool   success = 1;
   string message = 2;
+}
+
+service UserService {
+  rpc GetUser(GetUserRequest)    returns (GetUserResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
 }
