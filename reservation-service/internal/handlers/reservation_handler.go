@@ -34,6 +34,27 @@ func (h *ReservationHandler) CreateReservation(c *gin.Context) {
 		return
 	}
 
+	userIDraw, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "No user_id in JWT"})
+		return
+	}
+	// JWT sub обычно строка, а UserID у тебя uint.
+	// Надёжно привести:
+	var userID uint
+	switch v := userIDraw.(type) {
+	case string:
+		id, err := strconv.Atoi(v)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user_id in token"})
+			return
+		}
+		userID = uint(id)
+	case float64: // иногда приходит числом
+		userID = uint(v)
+	}
+	reservation.UserID = userID
+
 	layout := time.RFC3339 // date and time format
 
 	startTime, err := time.Parse(layout, reservation.StartTime)
