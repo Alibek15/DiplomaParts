@@ -65,6 +65,9 @@ public class User implements UserDetails {
     @Column(name = "REGISTRATION_DATE", nullable = false)
     private Date registrationDate;
 
+    @Column(name = "PHOTO_URL")
+    private String photoUrl;
+
     @Column(name = "ACCOUNT_STATUS", nullable = false)
     @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus;
@@ -129,6 +132,13 @@ public class User implements UserDetails {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
+    }
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
     public void setWebsite(String website) {

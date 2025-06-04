@@ -33,8 +33,7 @@ spring:
     serialization:
       indent-output: true
 
-jwt:
-  secret: aKQbGZytfI8bFv0Q7Fj1KhaOxiJ7Jef4R8XjxyPBrF0=
+
 
 logging:
   level:
