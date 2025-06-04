@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"coworking-diploma/proto" // импорт protobuf
 
@@ -19,25 +20,31 @@ type ReservationService struct {
 func (s *ReservationService) CreateReservation(reservation *models.Reservation) error {
 	ctx := context.Background()
 
+	var pricePerHour float64
+
+	// 1. Получаем цену за час
 	if reservation.RoomID != 0 {
-		_, err := s.CoworkingClient.GetRoomByID(ctx, &proto.GetRoomRequest{
+		roomResp, err := s.CoworkingClient.GetRoomByID(ctx, &proto.GetRoomRequest{
 			RoomId: uint32(reservation.RoomID),
 		})
 		if err != nil {
 			return fmt.Errorf("room not found: %w", err)
 		}
+		pricePerHour = roomResp.Room.PricePerHour
 	} else if reservation.SeatID != 0 {
-		_, err := s.CoworkingClient.GetSeatByID(ctx, &proto.GetSeatRequest{
+		seatResp, err := s.CoworkingClient.GetSeatByID(ctx, &proto.GetSeatRequest{
 			SeatId: uint32(reservation.SeatID),
 		})
 		if err != nil {
 			return fmt.Errorf("seat not found: %w", err)
 		}
+		pricePerHour = seatResp.Seat.PricePerHour
 	} else {
 		return fmt.Errorf("either RoomID or SeatID must be provided")
 	}
 
-	conflict, err := s.Repo.HasConflict(reservation) // Check for time conflicts in the database
+	// 2. Проверка конфликтов
+	conflict, err := s.Repo.HasConflict(reservation)
 	if err != nil {
 		return fmt.Errorf("conflict check failed: %w", err)
 	}
@@ -45,6 +52,27 @@ func (s *ReservationService) CreateReservation(reservation *models.Reservation) 
 		return fmt.Errorf("room or seat already reserved during this time")
 	}
 
+	// 3. Считаем длительность (в часах)
+	startTime, err := time.Parse(time.RFC3339, reservation.StartTime)
+	if err != nil {
+		return fmt.Errorf("invalid start_time: %w", err)
+	}
+	endTime, err := time.Parse(time.RFC3339, reservation.EndTime)
+	if err != nil {
+		return fmt.Errorf("invalid end_time: %w", err)
+	}
+	if !endTime.After(startTime) {
+		return fmt.Errorf("end_time must be after start_time")
+	}
+	duration := endTime.Sub(startTime).Hours()
+	if duration < 1 {
+		duration = 1 // Минимум 1 час (если хочешь можно убрать)
+	}
+
+	// 4. Высчитываем итоговую сумму
+	reservation.TotalPrice = pricePerHour * duration
+
+	// 5. Сохраняем
 	return s.Repo.Create(reservation)
 }
 
