@@ -28,14 +28,14 @@ public class TwoFactorService {
         if (verificationCode == null || verificationCode.isBlank())
             throw new IllegalArgumentException("verificationCode is required");
 
-        // Удаляем старую запись
+
         twoFactorRepository.findByUser_UserId(user.getUserId())
                 .ifPresent(twoFactorRepository::delete);
 
         TwoFactor tf = TwoFactor.builder()
                 .user(user)
                 .twoFaCode(generateTwoFaCode())
-                .verificationCode(verificationCode)   // <— важно!
+                .verificationCode(verificationCode)
                 .createdAt(new Date())
                 .updatedAt(new Date())
                 .twoFaExpiry(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
@@ -66,7 +66,7 @@ public class TwoFactorService {
 
         TwoFactor twoFactor = twoFactorOpt.get();
 
-        // Проверяем, не истек ли срок действия
+
         if (twoFactor.getTwoFaExpiry().before(new Date())) {
             log.warn("Verification code expired: {}", code);
             return false;

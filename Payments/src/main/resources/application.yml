@@ -1,0 +1,20 @@
+halyk:
+  base-url: https://testepay.homebank.kz   # Для тестов
+  oauth-url: https://testoauth.homebank.kz/epay2/oauth2/token
+  client-id: halykfinanceUSD
+  client-secret: U01gQZVL##lJ$NhJ
+  shop-id: 04f25a4b-d2bd-4dd8-b3a7-9390be4774c4
+  #account-id: 0003413423
+  success-url: http://localhost:3000/success
+  failure-url: http://localhost:3000/failure
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payment_service
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect

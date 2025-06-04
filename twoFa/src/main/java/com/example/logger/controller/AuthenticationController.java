@@ -25,12 +25,13 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody LoginRequest req) {
         authService.login(req);
-        return ResponseEntity.ok().build();  // отправили код на почту
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/confirm-2fa")
     public ResponseEntity<Map<String,String>> confirm2fa(@RequestBody TwoFactorConfirmRequest req) {
         String token = authService.confirmTwoFactor(req);
+        System.out.println("JWT: " + token);
         return ResponseEntity.ok(Map.of("token", token));
     }
 }

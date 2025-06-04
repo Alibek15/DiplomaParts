@@ -35,7 +35,7 @@ public class AuthenticationService {
     private final MessagePublisher publisher;
     private final JWTService jwtService;
 
-    /** Шаг 1: login → генерируем и сохраняем 2FA */
+
     @Transactional
     public void login(LoginRequest req) {
         User user = userRepo.findByEmail(req.getEmail())
@@ -44,29 +44,30 @@ public class AuthenticationService {
             throw new ServiceException("Invalid email or password");
         }
 
-        // 1) удалить старый TwoFactor (если он был)
+
         tfRepo.findByUser(user)
                 .ifPresent(oldTf -> tfRepo.delete(oldTf));
 
-        // 2) создать новый TwoFactor
+
         TwoFactor tf = new TwoFactor();
         String code = generateNumericCode();
         tf.setTwoFaCode(code);
         tf.setVerificationCode(UUID.randomUUID().toString());
         tf.setTwoFaExpiry(Date.from(Instant.now().plus(5, ChronoUnit.MINUTES)));
 
-        // 3) связать и сохранить
+
         user.setTwoFactor(tf);
         userRepo.save(user);
 
-        // 4) отправить код
+
         publisher.sendTwoFactorAuthEvent(new TwoFactorAuthEvent(
                 user.getEmail(), code));
     }
 
-    /** Шаг 2: confirm-2fa → активируем и удаляем запись 2FA */
+
     @Transactional
     public String confirmTwoFactor(TwoFactorConfirmRequest req) {
+        log.info("CONFIRM 2FA STARTED: " + req.getCode());
         TwoFactor tf = tfRepo.findByTwoFaCode(req.getCode())
                 .orElseThrow(() -> new ServiceException("Invalid 2FA code"));
 
@@ -78,15 +79,14 @@ public class AuthenticationService {
         User user = tf.getUser();
         user.setAccountStatus(AccountStatus.ACTIVE);
 
-        // отвязываем и удаляем TwoFactor
+
         user.removeTwoFactor();
-        // благодаря cascade=ALL запись удалится автоматически при сохранении user,
-        // но можно и явно:
-        // tfRepo.delete(tf);
+
 
         userRepo.save(user);
 
-        // генерируем JWT
+
+        System.out.println("JWT:" + jwtService.generateToken(user));
         return jwtService.generateToken(user);
     }
 

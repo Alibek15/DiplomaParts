@@ -34,7 +34,7 @@ spring:
       indent-output: true
 
 jwt:
-  secret: this_is_a_super_secret_key_of_32_bytes!
+  secret: aKQbGZytfI8bFv0Q7Fj1KhaOxiJ7Jef4R8XjxyPBrF0=
 
 logging:
   level:

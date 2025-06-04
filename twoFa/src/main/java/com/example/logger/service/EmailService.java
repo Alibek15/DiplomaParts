@@ -11,7 +11,7 @@ public class EmailService {
     private final JavaMailSender mailSender;
 
     /**
-     * Отправка письма с кодом двухфакторной аутентификации (2FA)
+     *
      *
      * @param to   Email получателя
      * @param code Код подтверждения
@@ -25,7 +25,7 @@ public class EmailService {
     }
 
     /**
-     * Отправка письма с ссылкой для подтверждения аккаунта
+     *
      *
      * @param to               Email получателя
      * @param verificationCode Уникальный код подтверждения
